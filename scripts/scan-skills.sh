@@ -5,7 +5,9 @@ SEARCH_PATHS=()
 if [ $# -gt 0 ]; then
     SEARCH_PATHS=("${@}")
 else
+    [ -d ".claude/skills" ] && SEARCH_PATHS+=(".claude/skills")
     [ -d ".agents/skills" ] && SEARCH_PATHS+=(".agents/skills")
+    [ -d ".github/skills" ] && SEARCH_PATHS+=(".github/skills")
     [ -d "skills" ] && SEARCH_PATHS+=("skills")
     if [ -n "${SKILLS_PATH:-}" ]; then
         IFS=':' read -ra EXTRA <<< "$SKILLS_PATH"
@@ -56,7 +58,7 @@ for search_path in "${SEARCH_PATHS[@]}"; do
         esc_desc=$(escape_json "$desc")
         printf '{"name":"%s","path":"%s","description":"%s","hash":"%s"}' \
             "$esc_name" "$esc_path" "$esc_desc" "$hash"
-    done < <(find "$search_path" -maxdepth 2 -name 'SKILL.md' -print 2>/dev/null || true)
+    done < <(find -L "$search_path" -maxdepth 2 -name 'SKILL.md' -print 2>/dev/null || true)
 done
 
 printf ']\n'
