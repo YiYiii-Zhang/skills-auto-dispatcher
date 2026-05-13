@@ -69,7 +69,8 @@ If the skill has `cross_refs`: load those referenced skills too. If a cross-ref 
 TASK → index fresh? → analyze → route-task.py → score
                                                    |
                           >= 0.3 ──────────────────→ execute
-                          < 0.3 ───────────────────→ no match, manual handling
+                          < 0.3 ───────────────────→ "没有匹配的 skill，我直接处理"
+                          empty ───────────────────→ same as < 0.3
                           decompose ───────────────→ split into subtasks
 
                           EXECUTE → success → deliver

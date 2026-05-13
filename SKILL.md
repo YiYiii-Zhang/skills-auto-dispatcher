@@ -33,8 +33,9 @@ python3 .agents/skills/skills-auto-dispatcher/scripts/route-task.py "$ARGUMENTS"
 | Score | Action |
 |-------|--------|
 | >= 0.3 | `Skill` tool (auto-execute, user can interrupt if wrong) |
-| < 0.3 | No match — tell user, handle manually |
+| < 0.3 | No match — tell user "没有匹配的 skill，我直接处理" |
 | decompose | Split into subtasks, route each independently |
+| empty   | No matches at all — tell user, proceed with general reasoning |
 
 ## 4. Fallback
 
