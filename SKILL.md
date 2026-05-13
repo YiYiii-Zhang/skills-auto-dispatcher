@@ -20,7 +20,7 @@ Usage: `/route <task description>` or auto-triggered by description match.
 bash .agents/skills/skills-auto-dispatcher/scripts/scan-skills.sh | python3 .agents/skills/skills-auto-dispatcher/scripts/update-skills-index.py
 ```
 
-Always run before routing to catch stale/removed skills.
+If `rebuild-on-start.sh` is configured as a SessionStart hook (recommended), the index is refreshed automatically at the start of every session. Otherwise, run this before routing to catch stale/removed skills. If the index is fresh (< 24h) and no new skills were added since last rebuild, this step is a no-op.
 
 ## 2. Score Task
 

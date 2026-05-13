@@ -40,6 +40,28 @@ Auto-trigger：在项目根目录 `CLAUDE.md` 加一行：
 收到任务时先跑 route-task.py，有 >= 0.3 的匹配就调 Skill。
 ```
 
+**SessionStart 自动重建索引**（推荐）：在 `.claude/settings.local.json` 加 SessionStart hook：
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .agents/skills/skills-auto-dispatcher/scripts/rebuild-on-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+这样每次新会话启动时自动检测新增/删除的 skill 并重建索引，不需要手动跑 scan+update。
+
 ### Codex CLI
 
 ```bash
@@ -145,6 +167,7 @@ AI 助手会自动编辑 `custom-cn-mappings.json` 追加映射。不需要你�
 | `scripts/scan-skills.sh` | 发现所有 SKILL.md，输出 JSON |
 | `scripts/update-skills-index.py` | 构建/更新 skills-index.json |
 | `scripts/route-task.py` | 对任务评分，建议匹配 |
+| `scripts/rebuild-on-start.sh` | SessionStart hook：自动检测新 skill 并重建索引 |
 | `custom-cn-mappings.json` | 用户自定义中文映射词库 |
 
 ## 维护
