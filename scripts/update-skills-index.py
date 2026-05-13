@@ -141,9 +141,15 @@ def build_index(skills_data, existing_index=None):
                 data["stale"] = True
                 skills[name] = data
 
+    # Derive scan paths from raw data (before dedup) so all sources appear
+    scan_paths = sorted(set(
+        os.path.dirname(os.path.dirname(e["path"]))
+        for e in skills_data
+    ))
+
     return {
         "generated": datetime.now(timezone.utc).isoformat(),
-        "scan_paths": [".agents/skills", "skills"],
+        "scan_paths": scan_paths,
         "total_skills": len([s for s in skills.values() if not s.get("stale")]),
         "_overrides": overrides,
         "skills": skills,
