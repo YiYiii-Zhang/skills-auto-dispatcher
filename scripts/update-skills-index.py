@@ -160,18 +160,7 @@ def main():
     force = "--force" in sys.argv
     output_path = os.path.join(os.path.dirname(__file__), "..", "skills-index.json")
 
-    # Check if update is needed
-    if not force and os.path.exists(output_path):
-        try:
-            with open(output_path) as f:
-                existing = json.load(f)
-            gen_time = datetime.fromisoformat(existing["generated"])
-            age = datetime.now(timezone.utc) - gen_time
-            if age < timedelta(hours=24):
-                print(f"Index is {age.total_seconds()/3600:.1f}h old, skipping (use --force to override)", file=sys.stderr)
-                return 0
-        except (json.JSONDecodeError, KeyError, ValueError):
-            pass  # Corrupt index, rebuild
+    # Always rebuild to detect stale/removed skills
 
     # Read scan data from stdin
     try:

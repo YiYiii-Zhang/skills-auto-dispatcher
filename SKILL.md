@@ -20,7 +20,7 @@ Usage: `/route <task description>` or auto-triggered by description match.
 bash .agents/skills/skills-auto-dispatcher/scripts/scan-skills.sh | python3 .agents/skills/skills-auto-dispatcher/scripts/update-skills-index.py
 ```
 
-Run if `skills-index.json` is missing or older than 24h.
+Always run before routing to catch stale/removed skills.
 
 ## 2. Score Task
 
