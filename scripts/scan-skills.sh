@@ -48,10 +48,16 @@ for search_path in "${SEARCH_PATHS[@]}"; do
 
         frontmatter=$(sed -n '/^---$/,/^---$/p' "$skill_md" 2>/dev/null | sed '1d;$d' || true)
 
+        fm_name=$(echo "$frontmatter" | grep -m1 '^name:' | sed 's/^name:[[:space:]]*//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' || echo "")
+        [ -n "$fm_name" ] && skill_name="$fm_name"
+
         desc=$(echo "$frontmatter" | grep -m1 '^description:' | sed 's/^description:[[:space:]]*//' || echo "")
         # Treat YAML block scalar indicators as empty → trigger fallback
         [ "$desc" = "|" ] && desc=""
         [ "$desc" = ">" ] && desc=""
+        # Treat quoted empty strings as empty
+        [ "$desc" = '""' ] && desc=""
+        [ "$desc" = "''" ] && desc=""
         if [ -z "$desc" ]; then
             # Capture indented continuation lines after "description: |" or "description: >"
             desc=$(echo "$frontmatter" | awk '
