@@ -171,6 +171,19 @@ CN_EN_MAP = {
     "统计": ["stats", "statistics", "analytics"],
     "排版": ["layout", "composition"],
     "设计": ["design", "style"],
+    # --- 调度/系统 ---
+    "调度": ["dispatch", "route", "schedule"],
+    "验证": ["validate", "verify", "check"],
+    "技能": ["skill", "capability"],
+    "长图": ["image", "screenshot", "capture"],
+    "图文": ["image", "text", "document"],
+    "资料": ["data", "source", "reference"],
+    "日报": ["report", "daily", "generate"],
+    "映射": ["mapping", "map", "transform"],
+    "页面": ["page", "website", "web"],
+    "前端": ["frontend", "web", "ui"],
+    "后端": ["backend", "server", "api"],
+    "界面": ["ui", "interface", "page"],
 }
 
 def load_custom_mappings():
@@ -219,23 +232,41 @@ def has_chinese(text):
 
 def find_unmapped_chinese(text):
     """Find Chinese words in text that have no CN_EN_MAP entry.
-    Splits on CN stop words to get individual words.
-    Returns a list of unique unmapped words, sorted by length desc.
+    Uses CN_EN_MAP as the primary tokenizer — matched words are excluded,
+    gaps between them become unmapped candidates. Stop words filter noise.
     """
     if not has_chinese(text):
         return []
-    # Build regex to split on CN stop words
-    stop_pattern = '|'.join(re.escape(w) for w in sorted(CN_STOP_WORDS, key=len, reverse=True))
-    parts = re.split(stop_pattern, text)
     unmapped = []
     seen = set()
-    for part in parts:
-        # Extract Chinese-only segments from each part
-        for m in re.finditer(r'[一-鿿]{2,}', part):
-            w = m.group()
-            if w not in seen and w not in CN_EN_MAP and not w.isspace():
-                seen.add(w)
-                unmapped.append(w)
+    mapped_words = sorted(CN_EN_MAP.keys(), key=len, reverse=True)
+
+    for segment in re.findall(r'[一-鿿]+', text):
+        covered = [False] * len(segment)
+        for word in mapped_words:
+            pos = 0
+            while True:
+                idx = segment.find(word, pos)
+                if idx == -1:
+                    break
+                for i in range(idx, idx + len(word)):
+                    covered[i] = True
+                pos = idx + 1
+
+        i = 0
+        while i < len(segment):
+            if not covered[i]:
+                j = i
+                while j < len(segment) and not covered[j]:
+                    j += 1
+                w = segment[i:j]
+                if len(w) >= 2 and w not in seen and w not in CN_STOP_WORDS:
+                    seen.add(w)
+                    unmapped.append(w)
+                i = j
+            else:
+                i += 1
+
     return sorted(unmapped, key=len, reverse=True)
 
 
