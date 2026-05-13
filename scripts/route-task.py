@@ -35,6 +35,7 @@ CN_STOP_WORDS = {
 
 # Chinese keyword -> English equivalents bridge
 CN_EN_MAP = {
+    # --- 视频/动画 ---
     "视频": ["video", "composition", "render"],
     "动画": ["animation", "animate", "motion"],
     "字幕": ["caption", "subtitle"],
@@ -44,6 +45,11 @@ CN_EN_MAP = {
     "转录": ["transcribe", "transcription"],
     "背景": ["background", "overlay"],
     "去背景": ["remove-background"],
+    "过渡": ["transition"],
+    "转场": ["transition", "scene"],
+    "场景": ["scene"],
+    "渲染": ["render", "preview"],
+    # --- 网站 ---
     "网站": ["website", "url", "page"],
     "网址": ["url", "website", "capture"],
     "截图": ["screenshot", "capture"],
@@ -51,34 +57,141 @@ CN_EN_MAP = {
     "捕捉": ["capture"],
     "网页": ["website", "page", "html"],
     "链接": ["url", "link"],
-    "过渡": ["transition"],
-    "转场": ["transition", "scene"],
-    "场景": ["scene"],
-    "文字": ["text", "caption"],
-    "高亮": ["highlight", "marker"],
-    "标注": ["annotation", "marker"],
-    "标题": ["title", "heading"],
-    "渲染": ["render", "preview"],
+    # --- 图片/图像 ---
+    "图片": ["image", "picture", "photo"],
+    "图像": ["image", "picture"],
+    "照片": ["photo", "picture"],
+    "压缩": ["compress", "optimize", "minify"],
+    "裁剪": ["crop", "resize", "trim"],
+    "缩放": ["scale", "resize", "zoom"],
+    # --- 文件操作 ---
+    "文件": ["file", "document"],
+    "保存": ["save", "export", "write"],
+    "读取": ["read", "load", "open"],
+    "写入": ["write", "save"],
+    "删除": ["delete", "remove"],
+    "复制": ["copy", "clone", "duplicate"],
+    "移动": ["move", "rename", "transfer"],
+    "重命名": ["rename"],
+    "目录": ["directory", "folder"],
+    "文件夹": ["folder", "directory"],
+    "路径": ["path", "route"],
+    "格式": ["format", "convert"],
+    # --- 数据库 ---
+    "数据库": ["database", "sql"],
+    "查询": ["query", "search"],
+    "优化": ["optimize", "tune"],
+    "表": ["table", "schema"],
+    "字段": ["column", "field"],
+    "索引": ["index"],
+    "数据": ["data", "dataset"],
+    "迁移": ["migrate", "migration"],
+    "备份": ["backup", "dump", "restore"],
+    "恢复": ["restore", "recover"],
+    # --- 文档/报告 ---
+    "文档": ["document", "doc", "file"],
+    "报告": ["report", "export", "generate"],
+    "导出": ["export", "generate", "output"],
+    "生成": ["generate", "create", "build"],
+    "模板": ["template", "scaffold", "boilerplate"],
+    "PDF": ["pdf", "document", "export"],
+    "表格": ["table", "spreadsheet", "grid"],
+    "图表": ["chart", "graph", "diagram"],
+    # --- 代码/开发 ---
+    "CSS": ["css", "style", "animation"],
+    "代码": ["code", "script"],
+    "接口": ["api"],
     "安装": ["install", "add"],
     "卸载": ["uninstall", "remove"],
     "调试": ["debug", "troubleshoot"],
     "检查": ["inspect", "lint", "validate"],
     "构建": ["build", "deploy"],
     "测试": ["test"],
-    "排版": ["layout", "composition"],
-    "设计": ["design", "style"],
-    "CSS": ["css", "style", "animation"],
-    "代码": ["code", "script"],
-    "接口": ["api"],
-    "数据库": ["database", "sql"],
-    "配置": ["config", "settings"],
-    "设置": ["settings", "config"],
-    "权限": ["permission"],
-    "钩子": ["hook"],
     "修复": ["fix", "debug"],
     "审查": ["review", "audit"],
     "重构": ["refactor"],
+    "脚本": ["script", "bash", "shell"],
+    "命令": ["command", "cli", "cmd"],
+    "编译": ["compile", "build"],
+    # --- 网络/API ---
+    "网络": ["network", "http", "request"],
+    "请求": ["request", "fetch", "call"],
+    "响应": ["response", "result"],
+    "上传": ["upload", "send"],
+    "下载": ["download", "fetch", "get"],
+    "发送": ["send", "push", "post"],
+    "接收": ["receive", "get", "fetch"],
+    "API": ["api", "endpoint", "interface"],
+    # --- 文本/搜索 ---
+    "文字": ["text", "caption"],
+    "文本": ["text", "content", "string"],
+    "搜索": ["search", "find", "query"],
+    "替换": ["replace", "substitute"],
+    "翻译": ["translate", "translation", "i18n"],
+    "正则": ["regex", "pattern"],
+    "匹配": ["match", "pattern", "filter"],
+    "格式化": ["format", "prettify", "beautify"],
+    "解析": ["parse", "decode", "extract"],
+    "标题": ["title", "heading"],
+    "高亮": ["highlight", "marker"],
+    "标注": ["annotation", "marker"],
+    # --- 邮件/通知 ---
+    "邮件": ["email", "mail", "smtp"],
+    "通知": ["notification", "notify", "alert"],
+    "消息": ["message", "msg", "chat"],
+    # --- 安全/认证 ---
+    "加密": ["encrypt", "encryption", "crypto"],
+    "解密": ["decrypt", "decode"],
+    "安全": ["security", "secure", "auth"],
+    "密钥": ["key", "secret", "token"],
+    "登录": ["login", "auth", "signin"],
+    "注册": ["register", "signup", "create"],
+    "权限": ["permission"],
+    # --- 系统/环境 ---
+    "配置": ["config", "settings"],
+    "设置": ["settings", "config"],
+    "环境": ["environment", "env"],
+    "变量": ["variable", "var", "env"],
+    "日志": ["log", "logging", "trace"],
+    "错误": ["error", "exception", "bug"],
+    "性能": ["performance", "optimize", "speed"],
+    "缓存": ["cache"],
+    "进程": ["process", "task", "job"],
+    "定时": ["cron", "schedule", "timer"],
+    "钩子": ["hook"],
+    # --- 通用操作 ---
+    "创建": ["create", "new", "make"],
+    "更新": ["update", "modify", "change"],
+    "查看": ["view", "show", "display", "list"],
+    "编辑": ["edit", "modify", "change"],
+    "分析": ["analyze", "analysis", "inspect"],
+    "监控": ["monitor", "watch", "observe"],
+    "统计": ["stats", "statistics", "analytics"],
+    "排版": ["layout", "composition"],
+    "设计": ["design", "style"],
 }
+
+def load_custom_mappings():
+    """Load user-defined CN→EN mappings from custom-cn-mappings.json.
+    File should be next to this script, with format:
+    {"中文词": ["english", "keywords"]}
+    Returns a dict merged into CN_EN_MAP (user mappings override built-in).
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    custom_path = os.path.join(script_dir, "..", "custom-cn-mappings.json")
+    if not os.path.exists(custom_path):
+        return {}
+    try:
+        with open(custom_path) as f:
+            custom = json.load(f)
+        if not isinstance(custom, dict):
+            return {}
+        return {k: v for k, v in custom.items() if isinstance(v, list)}
+    except (json.JSONDecodeError, IOError):
+        return {}
+
+# Merge custom mappings on import
+CN_EN_MAP = {**CN_EN_MAP, **load_custom_mappings()}
 
 DECOMPOSE_SIGNALS = [
     r'\band\b', r'\bthen\b', r'\bafter\b', r'\balso\b',
