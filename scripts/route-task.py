@@ -202,6 +202,8 @@ def main():
 
     matches = []
     for name, skill in skills.items():
+        if name == "skills-auto-dispatcher":
+            continue
         if skill.get("stale"):
             continue
         s = score_skill(task_tokens, skill)
@@ -223,6 +225,8 @@ def main():
             best_skill = None
             best_score = 0.0
             for name, skill in skills.items():
+                if name == "skills-auto-dispatcher":
+                    continue
                 if skill.get("stale"):
                     continue
                 s = score_skill(st_tokens, skill)
