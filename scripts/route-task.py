@@ -106,6 +106,8 @@ CN_EN_MAP = {
     "调试": ["debug", "troubleshoot"],
     "检查": ["inspect", "lint", "validate"],
     "构建": ["build", "deploy"],
+    "部署": ["deploy", "deployment", "release", "ship"],
+    "发布": ["release", "deploy", "publish", "launch"],
     "测试": ["test"],
     "修复": ["fix", "debug"],
     "审查": ["review", "audit"],
@@ -208,6 +210,28 @@ CN_DECOMPOSE_SIGNALS = [
 
 def has_chinese(text):
     return bool(re.search(r'[一-鿿]', text))
+
+
+def find_unmapped_chinese(text):
+    """Find Chinese words in text that have no CN_EN_MAP entry.
+    Splits on CN stop words to get individual words.
+    Returns a list of unique unmapped words, sorted by length desc.
+    """
+    if not has_chinese(text):
+        return []
+    # Build regex to split on CN stop words
+    stop_pattern = '|'.join(re.escape(w) for w in sorted(CN_STOP_WORDS, key=len, reverse=True))
+    parts = re.split(stop_pattern, text)
+    unmapped = []
+    seen = set()
+    for part in parts:
+        # Extract Chinese-only segments from each part
+        for m in re.finditer(r'[一-鿿]{2,}', part):
+            w = m.group()
+            if w not in seen and w not in CN_EN_MAP and not w.isspace():
+                seen.add(w)
+                unmapped.append(w)
+    return sorted(unmapped, key=len, reverse=True)
 
 
 def tokenize(text):
@@ -352,11 +376,14 @@ def main():
                 "score": round(best_score, 2),
             })
 
+    unmapped = find_unmapped_chinese(task)
+
     output = {
         "matches": matches[:5],
         "subtasks": subtasks,
         "decompose": decompose,
         "language": "zh" if has_chinese(task) else "en",
+        "unmapped_words": unmapped if unmapped else None,
     }
 
     print(json.dumps(output, indent=2, ensure_ascii=False))

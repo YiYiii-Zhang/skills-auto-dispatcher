@@ -37,7 +37,15 @@ python3 .agents/skills/skills-auto-dispatcher/scripts/route-task.py "$ARGUMENTS"
 | decompose | Split into subtasks, route each independently |
 | empty   | No matches at all — tell user, proceed with general reasoning |
 
-## 4. Fallback
+## 4. Unmapped Words
+
+If route-task.py returns `unmapped_words`, these are Chinese words in the task that have no English mapping. Tell the user and offer to add them:
+
+> "这些词没有映射: 部署前。要不要加到自定义词库里？"
+
+If user says yes, edit `custom-cn-mappings.json` to add the missing mappings.
+
+## 5. Fallback
 
 On failure: next-best match → read SKILL.md directly → handle manually → ask user.
 
