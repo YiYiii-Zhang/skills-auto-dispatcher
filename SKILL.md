@@ -32,10 +32,9 @@ python3 .agents/skills/skills-auto-dispatcher/scripts/route-task.py "$ARGUMENTS"
 
 | Score | Action |
 |-------|--------|
-| >= 0.7 | `Skill` tool |
-| 0.5 – 0.7 | `Skill` tool, confirm with user |
-| 0.3 – 0.5 | Suggest, don't auto-execute |
-| < 0.3 or decompose | Split into subtasks, re-score each |
+| >= 0.3 | `Skill` tool (auto-execute, user can interrupt if wrong) |
+| < 0.3 | No match — tell user, handle manually |
+| decompose | Split into subtasks, route each independently |
 
 ## 4. Fallback
 

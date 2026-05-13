@@ -24,19 +24,21 @@ A skill invocation has failed when:
 
 ### Fallback Chain
 
-Walk in order, stop at first success:
+Walk in order:
 
-1. **Retry same skill once**: reload index first (guard against stale path)
-2. **Next-best match**: from route-task.py output, pick the match with the next highest score (must be >= 0.3, and score diff from primary < 0.3)
-3. **Direct read**: read the target SKILL.md directly and follow instructions without the Skill tool
-4. **Generic approach**: handle the task without any skill, using general reasoning
-5. **Ask user**: report what failed and what alternatives exist
+1. **Tell user what failed**: which skill, why (invocation error / wrong match). One sentence.
+2. **Check next-best match** from route-task.py output:
+   - Score >= 0.3: "下一个是 (skill, score X)，要试吗?"
+   - Score < 0.3 or no more candidates: "没有更好的候选了，我手动处理"
+3. **User says yes** → try next match. If that also fails, repeat from step 1.
+4. **User says no** or exhausted → handle the task without any skill.
+
+Don't re-run route-task.py during fallback — reuse the original result.
 
 ### Rules
 
-- Never retry the same skill+task combination more than once.
-- Never silently retry — tell the user which fallback step you are on.
-- If a fallback skill also fails, continue down the chain.
+- Never retry the same skill on the same task.
+- Never silently retry — always tell user what happened.
 - Track failed skills per session to avoid cycles.
 
 ## Timeouts
