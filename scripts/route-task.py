@@ -192,8 +192,13 @@ def load_custom_mappings():
     except (json.JSONDecodeError, IOError):
         return {}
 
-# Merge custom mappings on import
-CN_EN_MAP = {**CN_EN_MAP, **load_custom_mappings()}
+# Merge custom mappings on import (custom extends built-in, same key = union)
+_custom = load_custom_mappings()
+for _k, _v in _custom.items():
+    if _k in CN_EN_MAP:
+        CN_EN_MAP[_k] = list(dict.fromkeys(CN_EN_MAP[_k] + _v))
+    else:
+        CN_EN_MAP[_k] = _v
 
 DECOMPOSE_SIGNALS = [
     r'\band\b', r'\bthen\b', r'\bafter\b', r'\balso\b',
@@ -287,7 +292,7 @@ def detect_decomposition(task_text):
     for pat in CN_DECOMPOSE_SIGNALS:
         if re.search(pat, task_text):
             signals_found += 1
-    return signals_found >= (1 if has_chinese(task_text) else 2)
+    return signals_found >= 1
 
 
 def split_subtasks(task_text):
@@ -311,7 +316,7 @@ def split_subtasks(task_text):
         for st in subtasks:
             parts = re.split(r'\s*\d+\.\s*', st)
             result.extend(p.strip() for p in parts if p.strip())
-        return [r for r in result if len(r.split()) >= 4]
+        return [r for r in result if len(r.split()) >= 3]
 
 
 def main():
@@ -378,8 +383,13 @@ def main():
 
     unmapped = find_unmapped_chinese(task)
 
+    tie = False
+    if len(matches) >= 2 and matches[0]["score"] == matches[1]["score"]:
+        tie = True
+
     output = {
         "matches": matches[:5],
+        "tie": tie if tie else None,
         "subtasks": subtasks,
         "decompose": decompose,
         "language": "zh" if has_chinese(task) else "en",
