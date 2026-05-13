@@ -1,14 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+find_project_root() {
+    local dir
+    dir=$(pwd)
+    while [ "$dir" != "/" ]; do
+        for d in ".claude/skills" ".agents/skills" ".github/skills" ".git"; do
+            if [ -d "$dir/$d" ]; then
+                echo "$dir"
+                return 0
+            fi
+        done
+        dir=$(dirname "$dir")
+    done
+    pwd
+}
+
+PROJECT_ROOT=$(find_project_root)
+
 SEARCH_PATHS=()
 if [ $# -gt 0 ]; then
     SEARCH_PATHS=("${@}")
 else
-    [ -d ".claude/skills" ] && SEARCH_PATHS+=(".claude/skills")
-    [ -d ".agents/skills" ] && SEARCH_PATHS+=(".agents/skills")
-    [ -d ".github/skills" ] && SEARCH_PATHS+=(".github/skills")
-    [ -d "skills" ] && SEARCH_PATHS+=("skills")
+    [ -d "$PROJECT_ROOT/.claude/skills" ] && SEARCH_PATHS+=("$PROJECT_ROOT/.claude/skills")
+    [ -d "$PROJECT_ROOT/.agents/skills" ] && SEARCH_PATHS+=("$PROJECT_ROOT/.agents/skills")
+    [ -d "$PROJECT_ROOT/.github/skills" ] && SEARCH_PATHS+=("$PROJECT_ROOT/.github/skills")
+    [ -d "$PROJECT_ROOT/skills" ] && SEARCH_PATHS+=("$PROJECT_ROOT/skills")
     if [ -n "${SKILLS_PATH:-}" ]; then
         IFS=':' read -ra EXTRA <<< "$SKILLS_PATH"
         SEARCH_PATHS+=("${EXTRA[@]}")

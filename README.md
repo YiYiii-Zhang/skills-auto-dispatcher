@@ -29,18 +29,33 @@ Output:
 
 ### Claude Code
 
-Copy or symlink into `.agents/skills/`. The system auto-discovers it:
+Copy or symlink into `.agents/skills/`:
 
 ```bash
-cp -r skills-auto-dispatcher .agents/skills/
+git clone https://github.com/YiYiii-Zhang/skills-auto-dispatcher.git .agents/skills/skills-auto-dispatcher
 ```
 
-After installing new skills, rebuild the index:
+Rebuild index with your own skills:
 
 ```bash
 bash .agents/skills/skills-auto-dispatcher/scripts/scan-skills.sh \
   | python3 .agents/skills/skills-auto-dispatcher/scripts/update-skills-index.py --force
 ```
+
+### Auto-trigger (one-time setup)
+
+Add this line to your CLAUDE.md so every task is auto-routed:
+
+```markdown
+收到新任务时，先跑 `python3 .agents/skills/skills-auto-dispatcher/scripts/route-task.py "<task>"`，
+有 >= 0.7 的匹配就调 Skill，没有则正常处理。
+```
+
+| Platform | Config file |
+|----------|-------------|
+| Claude Code | `CLAUDE.md` (项目根目录) |
+| GitHub Copilot | `.github/copilot-instructions.md` |
+| Codex CLI | `AGENTS.md` |
 
 ### Other Platforms (Codex, Copilot, Gemini CLI, etc.)
 
