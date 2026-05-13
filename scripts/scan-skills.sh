@@ -18,29 +18,45 @@ find_project_root() {
 
 PROJECT_ROOT=$(find_project_root)
 
-SEARCH_PATHS=()
-if [ $# -gt 0 ]; then
-    SEARCH_PATHS=("${@}")
-else
-    [ -d "$PROJECT_ROOT/.claude/skills" ] && SEARCH_PATHS+=("$PROJECT_ROOT/.claude/skills")
-    [ -d "$PROJECT_ROOT/.agents/skills" ] && SEARCH_PATHS+=("$PROJECT_ROOT/.agents/skills")
-    [ -d "$PROJECT_ROOT/.github/skills" ] && SEARCH_PATHS+=("$PROJECT_ROOT/.github/skills")
-    [ -d "$PROJECT_ROOT/skills" ] && SEARCH_PATHS+=("$PROJECT_ROOT/skills")
-    if [ -n "${SKILLS_PATH:-}" ]; then
-        IFS=':' read -ra EXTRA <<< "$SKILLS_PATH"
-        SEARCH_PATHS+=("${EXTRA[@]}")
-    fi
-fi
-
 escape_json() {
     printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\n/\\n/g; s/\t/\\t/g; s/\r/\\r/g'
 }
 
+# Build list of (path, maxdepth) pairs. Plugins first — highest priority for new users.
+declare -a SCAN_SPECS=()
+
+if [ $# -gt 0 ]; then
+    for p in "${@}"; do
+        SCAN_SPECS+=("$p|2")
+    done
+else
+    # Plugin marketplace — where most users install their first skills
+    [ -d "$HOME/.claude/plugins" ] && SCAN_SPECS+=("$HOME/.claude/plugins|10")
+    [ -d "$PROJECT_ROOT/.claude/plugins" ] && SCAN_SPECS+=("$PROJECT_ROOT/.claude/plugins|10")
+
+    # Local project skills
+    [ -d "$PROJECT_ROOT/.claude/skills" ] && SCAN_SPECS+=("$PROJECT_ROOT/.claude/skills|2")
+    [ -d "$PROJECT_ROOT/.agents/skills" ] && SCAN_SPECS+=("$PROJECT_ROOT/.agents/skills|2")
+    [ -d "$PROJECT_ROOT/.github/skills" ] && SCAN_SPECS+=("$PROJECT_ROOT/.github/skills|2")
+    [ -d "$PROJECT_ROOT/skills" ] && SCAN_SPECS+=("$PROJECT_ROOT/skills|2")
+
+    if [ -n "${SKILLS_PATH:-}" ]; then
+        IFS=':' read -ra EXTRA <<< "$SKILLS_PATH"
+        for p in "${EXTRA[@]}"; do
+            SCAN_SPECS+=("$p|2")
+        done
+    fi
+fi
+
 first=true
 printf '['
 
-for search_path in "${SEARCH_PATHS[@]}"; do
+for spec in "${SCAN_SPECS[@]}"; do
+    search_path="${spec%%|*}"
+    maxdepth="${spec##*|}"
+
     [ -d "$search_path" ] || continue
+
     while IFS= read -r skill_md; do
         [ -z "$skill_md" ] && continue
         skill_dir=$(dirname "$skill_md")
@@ -52,14 +68,11 @@ for search_path in "${SEARCH_PATHS[@]}"; do
         [ -n "$fm_name" ] && skill_name="$fm_name"
 
         desc=$(echo "$frontmatter" | grep -m1 '^description:' | sed 's/^description:[[:space:]]*//' || echo "")
-        # Treat YAML block scalar indicators as empty → trigger fallback
         [ "$desc" = "|" ] && desc=""
         [ "$desc" = ">" ] && desc=""
-        # Treat quoted empty strings as empty
         [ "$desc" = '""' ] && desc=""
         [ "$desc" = "''" ] && desc=""
         if [ -z "$desc" ]; then
-            # Capture indented continuation lines after "description: |" or "description: >"
             desc=$(echo "$frontmatter" | awk '
                 /^description:/{flag=1; next}
                 flag {
@@ -81,7 +94,7 @@ for search_path in "${SEARCH_PATHS[@]}"; do
         esc_desc=$(escape_json "$desc")
         printf '{"name":"%s","path":"%s","description":"%s","hash":"%s"}' \
             "$esc_name" "$esc_path" "$esc_desc" "$hash"
-    done < <(find -L "$search_path" -maxdepth 2 -name 'SKILL.md' -print 2>/dev/null || true)
+    done < <(find -L "$search_path" -maxdepth "$maxdepth" -name 'SKILL.md' -print 2>/dev/null || true)
 done
 
 printf ']\n'
